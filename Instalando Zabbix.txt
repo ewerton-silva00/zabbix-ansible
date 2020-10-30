@@ -72,39 +72,3 @@ ServerActive=127.0.0.1
 
 INICIANDO E HABILITANDO OS SERVIÇOS DO ZABBIX-SERVER, HTTPD E POSTGRESQL
 #systemctl start zabbix-server && systemctl enable zabbix-server && systemctl start zabbix-agent && systemctl enable zabbix-agent && systemctl start httpd && systemctl enable httpd && systemctl status zabbix-server && systemctl status zabbix-agent && systemctl status httpd
-
-
-
-
-
-
-
-
-
-CONFIGURANDO AGENT NO WINDOWS
-
-****FILE CONF AGENT ZABBIX****
-
-Server=192.168.1.16
-Hostname=srvnobreak
-StartAgents=3
-ServerActive=192.168.1.16
-DebugLevel=3
-LogFile=C:\zabbix\zabbix_agentd.log
-Timeout=3
-
-
-****INSTALL AGENT SERVICE AT WINDOWS****
-c:\zabbix\bin\zabbix_agentd.exe -i -c c:\zabbix\conf\zabbix_agentd.conf
-
-****UNINSTALL AGENT SERVICE AT WINDOWS****
-c:\zabbix\bin\zabbix_agentd.exe -d -c c:\zabbix\conf\zabbix_agentd.conf
-
-
-COMANDOS RÁPIDOS ZABBIX
-
-VERIFICAR A VERSÃO DO ZABBIX
-#zabbix_server -V
-
-PESQUISAR PACOTES DO ZABBIX NO REPOSITÓRIO
-#rpm -qa | grep zabbix
