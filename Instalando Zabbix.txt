@@ -1,0 +1,110 @@
+Install Zabbix 4 WITH Postgresql-12 step by step
+
+INSTALANDO PACOTES ESSENCIAIS
+#yum install -y epel-release centos-release-scl yum-utils yum update
+#yum groupinstall "Development Tools" -y 
+#yum install -y qemu-guest-agent vim wget net-tools
+
+DESABILITANDO SELINUX
+#sudo setenforce 0
+#sudo sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+
+DESABILITANDO O FIREWALLD
+#systemctl disable firewalld && systemctl stop firewalld && systemctl status firewalld
+
+INSTALANDO PHP72
+#yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm && yum-config-manager --enable remi-php72 && yum update -y
+#yum install -y php72-php-gd php72-php-fpm php72-php-ldap php72-php-xml php72-php-mbstring php72-php-pgsql php72-php-bcmath php72
+
+INSTALANDO BANCO POSTGRESQL
+#yum install -y https://download.postgresql.org/pub/repos/yum/12/redhat/rhel-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm && yum update -y
+#yum install -y postgresql12-server postgresql12-contrib
+
+INICIANDO O BANCO POSTGRESQL
+#/usr/pgsql-12/bin/postgresql-12-setup initdb && systemctl enable postgresql-12 && systemctl start postgresql-12 && systemctl status postgresql-12
+
+ACESSANDO O BANCO DE DADOS
+#sudo -i -u postgres
+$psql
+
+ALTERAR SENHA USÁRIO POSTGRESQL
+#ALTER USER postgres PASSWORD 'suporte#2020';
+#\q
+$exit
+
+HABILITAR MD5 NO CONF POSTGRESQL
+#sed -i -e 's/ident/md5/' /var/lib/pgsql/12/data/pg_hba.conf && cat /var/lib/pgsql/12/data/pg_hba.conf && systemctl reload postgresql-12 && systemctl status postgresql-12
+
+CRIANDO USUÁRIO ZABBIX PARA ACESSO FRONTEND
+#sudo -i -u postgres
+$psql
+#CREATE DATABASE zabbix4;
+#CREATE USER zabbix4 WITH PASSWORD 'zbx#2020';
+#GRANT ALL ON DATABASE zabbix4 TO zabbix4;
+#\q
+$exit
+
+INSTALANDO REPOSITÓRIO ZABBIX 4
+#rpm -ivh http://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-2.el7.noarch.rpm && yum install -y fping net-snmp net-snmp-utils zabbix-get zabbix-agent zabbix-server-pgsql zabbix-web-pgsql && zcat /usr/share/doc/zabbix-server-pgsql-4.0.*/create.sql.gz | psql -h 127.0.0.1 -U zabbix4
+
+CONFIGURANDO O ZABBIX-SERVER.CONF
+#vim /etc/zabbix/zabbix_server.conf
+
+ALTERAR AS LINHAS
+DBHost=localhost
+DBName=zabbix4
+DBUser=zabbix4
+DBPassword=zbx#2020
+
+ALTERANDO TIMEZONE
+#vim /etc/httpd/conf.d/zabbix.conf
+
+ALTERAR A LINHA
+php_value date.timezone America/Fortaleza
+
+CONFIGURADO O ZABBIX-AGENT.CONF
+#vim /etc/zabbix/zabbix_agentd.conf
+
+ALTERAR AS LINHAS
+Hostname=zabbix
+Server=127.0.0.1
+ServerActive=127.0.0.1
+
+INICIANDO E HABILITANDO OS SERVIÇOS DO ZABBIX-SERVER, HTTPD E POSTGRESQL
+#systemctl start zabbix-server && systemctl enable zabbix-server && systemctl start zabbix-agent && systemctl enable zabbix-agent && systemctl start httpd && systemctl enable httpd && systemctl status zabbix-server && systemctl status zabbix-agent && systemctl status httpd
+
+
+
+
+
+
+
+
+
+CONFIGURANDO AGENT NO WINDOWS
+
+****FILE CONF AGENT ZABBIX****
+
+Server=192.168.1.16
+Hostname=srvnobreak
+StartAgents=3
+ServerActive=192.168.1.16
+DebugLevel=3
+LogFile=C:\zabbix\zabbix_agentd.log
+Timeout=3
+
+
+****INSTALL AGENT SERVICE AT WINDOWS****
+c:\zabbix\bin\zabbix_agentd.exe -i -c c:\zabbix\conf\zabbix_agentd.conf
+
+****UNINSTALL AGENT SERVICE AT WINDOWS****
+c:\zabbix\bin\zabbix_agentd.exe -d -c c:\zabbix\conf\zabbix_agentd.conf
+
+
+COMANDOS RÁPIDOS ZABBIX
+
+VERIFICAR A VERSÃO DO ZABBIX
+#zabbix_server -V
+
+PESQUISAR PACOTES DO ZABBIX NO REPOSITÓRIO
+#rpm -qa | grep zabbix
