@@ -1,0 +1,11 @@
+[vagrant_hosts]
+zabbix-server ansible_host=10.10.10.10
+
+[vagrant_hosts:vars]
+ansible_connection=ssh
+ansible_port=22
+ansible_user=vagrant
+ansible_password=vagrant
+ansible_become=yes
+ansible_become_method=sudo
+ansible_become_user=root
